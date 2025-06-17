@@ -3,8 +3,12 @@
   "WorkspaceRootPath": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|f:\\tsokaoproject\\tsokaounitycutfruitgametest\\assets\\scripts\\scripttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scripttest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|f:\\tsokaoproject\\tsokaounitycutfruitgametest\\assets\\scripts\\cutfruitscripts\\startmenucontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cutfruitscripts\\startmenucontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\assets\\scripts\\cutfruitscripts\\bomb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C5AEC60C-DB90-9426-E713-3B4259683511}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\cutfruitscripts\\bomb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,15 +23,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ScriptTest.cs",
-              "DocumentMoniker": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\ScriptTest.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\ScriptTest.cs",
-              "ToolTip": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\ScriptTest.cs",
-              "RelativeToolTip": "Assets\\Scripts\\ScriptTest.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Title": "StartMenuController.cs",
+              "DocumentMoniker": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\CutFruitScripts\\StartMenuController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CutFruitScripts\\StartMenuController.cs",
+              "ToolTip": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\CutFruitScripts\\StartMenuController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CutFruitScripts\\StartMenuController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvw4AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-12T08:50:08.115Z",
+              "WhenOpened": "2025-06-17T08:54:54.453Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Bomb.cs",
+              "DocumentMoniker": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\CutFruitScripts\\Bomb.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CutFruitScripts\\Bomb.cs",
+              "ToolTip": "F:\\TsokaoProject\\TsokaoUnityCutFruitGameTest\\Assets\\Scripts\\CutFruitScripts\\Bomb.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CutFruitScripts\\Bomb.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvxcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-17T06:51:17.399Z"
             }
           ]
         }
