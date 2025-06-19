@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,27 +10,35 @@ public class StartMenuController : MonoBehaviour
     [SerializeField] private AudioClip menuMusic;
     [SerializeField] private AudioClip buttonSound;
 
+    AudioSource audioSource;
     private void Start()
     {
-        //播放菜单音乐
-        AudioSource audioSource = GameManager.Instance.GetComponent<AudioSource>();
-        if(menuMusic!=null)
+        
+        if (GameManager.Instance !=null)
         {
-            audioSource.clip = menuMusic;
-            audioSource.Play();
+            audioSource = GameManager.Instance.GetComponent<AudioSource>();
+
+            if (menuMusic != null)
+            {
+                audioSource.clip = menuMusic;
+                audioSource.Play();
+            }
+
+
+            startButton.onClick.AddListener
+            (() =>
+            {
+
+                if (buttonSound != null)
+                {
+                    audioSource.PlayOneShot(buttonSound);
+                }
+                GameManager.Instance.ShowMainMenu();
+                
+            }
+            );
+
         }
 
-        //设置开始按钮事件
-        startButton.onClick.AddListener
-        (() =>
-         {
-            //播放按钮音效
-            if (buttonSound != null)
-            {
-                audioSource.PlayOneShot(buttonSound);
-            }
-            //GameManager.Instance.ShowMainMenu();
-         }
-        );
     }
 }
