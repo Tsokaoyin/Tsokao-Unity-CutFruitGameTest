@@ -26,10 +26,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text scoreText;
     [SerializeField] private Text livesText;
     [SerializeField] private Text timeText;  //时间模式倒计时
-    [SerializeField] private Text coinText;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject revivePanel;
-    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private Text coinsText;
+    [SerializeField] private GameObject gameOverPanel;  //游戏结束面板
+    [SerializeField] private GameObject revivePanel;  //游戏复活面板
+    [SerializeField] private GameObject pausePanel;  //游戏暂停面板
 
     [Header("奖牌系统")]
     [SerializeField] private GameObject bronzeMedal;
@@ -39,6 +39,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int silverThreshold = 300;
     [SerializeField] private int goldThreshold = 500;
 
+    //游戏状态
+    public int score { get; private set; } = 0;
+    private  int currentLives;
+    private int initialLives=3;
+    private int coins;
+    private int sessionCoins = 0;  ///当前游戏获得的金币
+    private float gameTime = 0f;  //游戏时间（用于时间模式）
+    private float timeLimit = 90f;  //时间模式的时间限制
+    private bool isPaused = false;
+    private bool isRevived = false;  //是否已经复活
+    private GameMode currentGameMode = GameMode.Infinite;  //默认无限时间模式
 
     private void Awake()
     {
@@ -56,7 +67,8 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(this.gameObject);
         }
 
-       
+        //加载金币和最高分数
+        coins = PlayerPrefs.GetInt("coins", 0);
     }
 
     private void OnDestroy()
@@ -98,8 +110,105 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    /// <summary>
+    /// 开始游戏
+    /// </summary>
+    /// <param name="mode"></param>
     public void NewGame(GameMode mode)
     {
         currentGameMode = mode;
+        isRevived = false;
+        sessionCoins = 0;
+
+        //重置游戏状态
+        Time.timeScale = 1f;
+        score = 0;
+        currentLives = initialLives;
+        gameTime = timeLimit;
+
+        //更新UI
+        scoreText.text = score.ToString();
+        livesText.text = $"Lives:{currentLives}";
+        coinsText.text = $"Coins:{coins}";
+        timeText.text = $"Time:{Mathf.CeilToInt(gameTime)}";
+
+        gameOverPanel.SetActive(false);
+        revivePanel.SetActive(false);
+        pausePanel.SetActive(false);
+        UpdateMedalDisplay();
+
+        //清理场景
+        ClearScene();
+
+        blade.enabled = true;
+        spawner.enabled = true;
+
+        //加载游戏场景
+        SceneManager.LoadScene("GameScene");
+    }
+
+    private void Update()
+    {
+        //时间模式倒计时
+        if(currentGameMode==GameMode.TimeLimit&&Time.timeScale>0)
+        {
+            gameTime -= Time.deltaTime;
+            timeText.text = $"Time:{Mathf.CeilToInt(gameTime)}";
+
+            if(gameTime<=0)
+            {
+
+            }
+        }
+    }
+
+    private void GameOve()
+    {
+        
+    }
+
+    private void ClearScene()
+    {
+        //使用对象池回首所有游戏
+    }
+
+    /// <summary>
+    /// 增加分数
+    /// </summary>
+    /// <param name="points">消除对象获得的分数</param>
+    public void IncreaseScore(int points)
+    {
+        score += points;
+        scoreText.text = score.ToString();
+
+        //每100分获得1金币
+        if(score%100==0)
+        {
+            AddCoins(1);
+            sessionCoins++;
+        }
+    }
+
+    public void AddCoins(int amout)
+    {
+        coins += amout;
+        PlayerPrefs.SetInt("coins", coins);
+        coinsText.text = $"Coins:{coins}";
+
+        //播放金币音效
+        if(coinSound!=null)
+        {
+            audioSource.PlayOneShot(coinSound);
+        }
+    }
+
+    /// <summary>
+    /// 更新奖牌显示
+    /// </summary>
+    private void UpdateMedalDisplay()
+    {
+        bronzeMedal.SetActive(score >= bronzeThreshold);
+        silverMedal.SetActive(score >= silverThreshold);
+        goldMedal.SetActive(score >= goldThreshold);
     }
 }

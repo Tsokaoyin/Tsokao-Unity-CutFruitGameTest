@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class Blade : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float sliceForce = 5.0f;
+    public float minSliceVelocity = 0.01f;
 
-    // Update is called once per frame
-    void Update()
+    //«–∏Ó“Ù–ß
+    public AudioClip sliceSound;
+    private AudioSource audioSource;
+
+    private Camera mainCamera;
+    private Collider sliceCollider;
+    private TrailRenderer sliceTrail;
+
+    public Vector3 direction { get; private set; }
+    public bool slicing { get; private set; }
+
+    private void Awake()
     {
         
     }
