@@ -67,22 +67,36 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
-    //从对象池获取对象
+    /// <summary>
+    /// 从对象池获取对象
+    /// </summary>
+    /// <param name="prefab">要获取的对象的预制体模板</param>
+    /// <param name="position">对象实例化后的位置</param>
+    /// <param name="rotation">对象实例化后的旋转角度</param>
+    /// <returns></returns>
     public GameObject GetFromPool(GameObject prefab,Vector3 position,Quaternion rotation)
     {
-        if(objectPools.ContainsKey(prefab))
+        //检查对象池是否存在,若字典中已存在该预制体的池，则继续检查池中是否有可用对象。
+        if (objectPools.ContainsKey(prefab))
         {
+            //从池中获取可用对象
             if (objectPools[prefab].Count>0)
             {
+                //从队列中取出一个对象（Dequeue()），设置其位置和旋转。
                 GameObject obj = objectPools[prefab].Dequeue();
                 obj.transform.position = position;
                 obj.transform.rotation = rotation;
+                //激活对象（SetActive(true)），使其重新参与游戏逻辑。
                 obj.SetActive(true);
 
                 //重置对象
                 if(obj.CompareTag("Fruit"))
                 {
                     obj.GetComponent<Fruit>().ResetFruit();
+                }
+                else if(obj.CompareTag("Bomb"))
+                {
+                    obj.GetComponent<Bomb>().ResetBomb();
                 }
 
                 return obj;
@@ -103,6 +117,10 @@ public class ObjectPool : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 返回对象池
+    /// </summary>
+    /// <param name="obj">被返回的对象</param>
     public void ReturnToPool(GameObject obj)
     {
         if(prefabLookup.ContainsKey(obj))
@@ -119,6 +137,24 @@ public class ObjectPool : MonoBehaviour
         {
             //如果对象不再池中，销毁它
             Destroy(obj);
+        }
+    }
+
+    //将所有对象回收到对象池
+    public void ReturnAllToPool()
+    {
+        //查找所有水果和炸弹
+        Fruit[] fruits = FindObjectsOfType<Fruit>();
+        Bomb[] bombs = FindObjectsOfType<Bomb>();
+
+        foreach(Fruit fruit in fruits)
+        {
+            ReturnToPool(fruit.gameObject);
+        }
+
+        foreach(Bomb bomb in bombs)
+        {
+            ReturnToPool(bomb.gameObject);
         }
     }
 

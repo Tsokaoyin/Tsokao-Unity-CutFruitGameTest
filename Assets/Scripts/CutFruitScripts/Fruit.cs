@@ -25,12 +25,22 @@ public class Fruit : MonoBehaviour
         fruitRigidbody = GetComponent<Rigidbody>();
         fruitCollider = GetComponent<Collider>();
         juiceEffect = GetComponentInChildren<ParticleSystem>();
+
+        //如果水果没有被切调用本协程方法
+        StartCoroutine(DelayedReturnToPool(4));
     }
 
+
+    /// <summary>
+    /// 水果被切割的方法
+    /// </summary>
+    /// <param name="direction">切割方向</param>
+    /// <param name="position">切割位置</param>
+    /// <param name="force">切割力度</param>
     private void Slice(Vector3 direction,Vector3 position,float force)
     {
         //增加分数
-        GameManager.Instance.AddCoins(points);
+        GameManager.Instance.IncreaseScore(points);
 
         //播放切割音效
         if(sliceSound!=null)
@@ -62,12 +72,12 @@ public class Fruit : MonoBehaviour
         }
 
         //延迟回收切片
-        StartCoroutine(DelayedReturnToPool());
+        StartCoroutine(DelayedReturnToPool(3));
     }
 
-    private IEnumerator DelayedReturnToPool()
+    private IEnumerator DelayedReturnToPool(int delayed)
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(delayed);
 
         //重置水果状态
         whole.SetActive(true);
@@ -87,7 +97,9 @@ public class Fruit : MonoBehaviour
         }
     }
 
-    //重置水果状态
+    /// <summary>
+    /// 重置水果状态
+    /// </summary>
     public void ResetFruit()
     {
         whole.SetActive(true);

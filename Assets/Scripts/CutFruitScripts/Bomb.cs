@@ -27,7 +27,9 @@ public class Bomb : MonoBehaviour
         }
     }
 
-    //重置炸弹状态
+    /// <summary>
+    /// 重置炸弹状态
+    /// </summary>
     public void ResetBomb()
     {
         GetComponent<Collider>().enabled=true;

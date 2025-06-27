@@ -35,18 +35,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject bronzeMedal;
     [SerializeField] private GameObject silverMedal;
     [SerializeField] private GameObject goldMedal;
-    [SerializeField] private int bronzeThreshold = 100;
-    [SerializeField] private int silverThreshold = 300;
-    [SerializeField] private int goldThreshold = 500;
+    [SerializeField] public int bronzeThreshold = 100;
+    [SerializeField] public int silverThreshold = 300;
+    [SerializeField] public int goldThreshold = 500;
 
     //游戏状态
     public int score { get; private set; } = 0;
     private  int currentLives;
     private int initialLives=3;
-    private int coins;
+    private int coins=0;
     private int sessionCoins = 0;  ///当前游戏获得的金币
     private float gameTime = 0f;  //游戏时间（用于时间模式）
-    private float timeLimit = 90f;  //时间模式的时间限制
+    [SerializeField]public  float timeLimit = 90f;  //时间模式的时间限制
     private bool isPaused = false;
     private bool isRevived = false;  //是否已经复活
     private GameMode currentGameMode = GameMode.Infinite;  //默认无限时间模式
@@ -69,6 +69,12 @@ public class GameManager : MonoBehaviour
 
         //加载金币和最高分数
         coins = PlayerPrefs.GetInt("coins", 0);
+
+        //如果还没有初始化，加载游戏初始场景
+        if(SceneManager.GetActiveScene().name!="StartMenu")
+        {
+            SceneManager.LoadScene("StartMenu");
+        }
     }
 
     private void OnDestroy()
@@ -82,14 +88,14 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         //播放背景音乐
-        //if (bgm != null)
-        //{
-        //    audioSource.clip = bgm;
-        //    audioSource.Play();
-        //}
+        if (bgm != null)
+        {
+            audioSource.clip = bgm;
+            audioSource.Play();
+        }
 
         //显示开始界面
-        ShowStartMenu();
+       // ShowStartMenu();
     }
 
     /// <summary>
@@ -128,8 +134,8 @@ public class GameManager : MonoBehaviour
 
         //更新UI
         scoreText.text = score.ToString();
-        livesText.text = $"Lives:{currentLives}";
-        coinsText.text = $"Coins:{coins}";
+        livesText.text = $"{currentLives}";
+        coinsText.text = $"{coins}";
         timeText.text = $"Time:{Mathf.CeilToInt(gameTime)}";
 
         gameOverPanel.SetActive(false);
@@ -145,6 +151,8 @@ public class GameManager : MonoBehaviour
 
         //加载游戏场景
         SceneManager.LoadScene("GameScene");
+        audioSource.clip = bgm;
+        audioSource.Play();
     }
 
     private void Update()
@@ -157,19 +165,91 @@ public class GameManager : MonoBehaviour
 
             if(gameTime<=0)
             {
+                GameOver();
+            }
 
+            //暂停游戏
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                TogglePause();
             }
         }
     }
 
-    private void GameOve()
+    /// <summary>
+    /// 暂停/继续游戏
+    /// </summary>
+    public void TogglePause()
     {
-        
+        isPaused = !isPaused;
+        if (pausePanel != null) pausePanel.SetActive(true);
+        Time.timeScale = isPaused ? 0f : 1f;
     }
 
+    private void GameOver()
+    {
+       blade.enabled = false;
+        spawner.enabled = false;
+
+        if(gameOverSound!=null)
+        {
+            AudioSource.PlayClipAtPoint(gameOverSound, Camera.main.transform.position);
+
+        }
+
+        int coinsEarned = CalculateCoinsEarned();
+        sessionCoins += coinsEarned;
+        AddCoins(coinsEarned);
+
+        if(!isRevived)
+        {
+            revivePanel.SetActive(true);
+            if(revivePanel.GetComponentInChildren<Text>()!=null)
+            {
+                revivePanel.GetComponentInChildren<Text>().text = $"Earned{sessionCoins}coins!\nRevive?";
+            }
+            else
+            {
+                ShowGameOver();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 计算金币奖励
+    /// </summary>
+    /// <returns></returns>
+    private int CalculateCoinsEarned()
+    {
+        int baseCoins = score / 100;
+        int timeBonus = 0;
+        int medalBouns = 0;
+
+        if(currentGameMode==GameMode.TimeLimit)
+        {
+            timeBonus = Mathf.CeilToInt(gameTime) / 10;
+        }
+
+        if (score >= goldThreshold)
+        {
+            medalBouns = 5;
+        }
+        else if (score >= silverThreshold) medalBouns = 3;
+        else if (score >= bronzeThreshold) medalBouns = 1;
+
+        return baseCoins + timeBonus + medalBouns;
+    }
+
+    /// <summary>
+    /// 清理场景
+    /// </summary>
     private void ClearScene()
     {
-        //使用对象池回首所有游戏
+        //使用对象池回收所有游戏对象
+        if(ObjectPool.Instance!=null)
+        {
+            ObjectPool.Instance.ReturnAllToPool();
+        }
     }
 
     /// <summary>
@@ -189,11 +269,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 增加金币
+    /// </summary>
+    /// <param name="amout">金币数</param>
     public void AddCoins(int amout)
     {
         coins += amout;
         PlayerPrefs.SetInt("coins", coins);
-        coinsText.text = $"Coins:{coins}";
+        coinsText.text = $"{coins}";
 
         //播放金币音效
         if(coinSound!=null)
@@ -211,4 +295,108 @@ public class GameManager : MonoBehaviour
         silverMedal.SetActive(score >= silverThreshold);
         goldMedal.SetActive(score >= goldThreshold);
     }
+
+    /// <summary>
+    /// 执行炸弹伤害逻辑
+    /// </summary>
+    public void BombExploded()
+    {
+        currentLives--;
+        livesText.text = $"Lives:{currentLives}";
+
+        if(currentLives<=0)
+        {
+            GameOver();
+        }
+    }
+
+    /// <summary>
+    /// 显示游戏结束面板
+    /// </summary>
+    public void ShowGameOver()
+    {
+        gameOverPanel.SetActive(true);
+        if(gameOverPanel.GetComponentInChildren<Text>()!=null)
+        {
+            /*
+             * 字符串插值：$"Game Over\nScore: {score}\nCoins Earned: {sessionCoins}"
+               使用 C# 的字符串插值语法，动态拼接文本内容，例如：
+               Game Over
+               Score: 100
+               Coins Earned: 50
+              {score} 和 {sessionCoins} 是变量占位符，会被实际的变量值替换。
+              \n 是换行符，用于在文本中创建多行效果。
+             */
+            gameOverPanel.GetComponentInChildren<Text>().text =
+                $"Game Over\nScore:{score}\nCoins Earned:{sessionCoins}";
+
+        }
+    }
+
+    /// <summary>
+    /// 复活
+    /// </summary>
+    /// <param name="useCoins">是否使用金币复活</param>
+    public void Revive(bool useCoins)
+    {
+        if(useCoins)
+        {
+            int reviveCost = 50;
+            if(coins>=reviveCost)
+            {
+                coins -= reviveCost;
+                PlayerPrefs.SetInt("coins", coins);
+                coinsText.text = $"Coins:{coins}";
+                DoRevive();
+            }
+        }
+        else
+        {
+            StartCoroutine(WatchAdAndRevive());
+        }
+    }
+
+    /// <summary>
+    /// 观看广告复活协程
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator WatchAdAndRevive()
+    {
+        Text reviveText = revivePanel.GetComponentInChildren<Text>();
+        if(reviveText!=null)
+        {
+            reviveText.text = "Watching Ad...";
+        }
+        yield return new WaitForSecondsRealtime(3f);
+        DoRevive();
+    }
+
+    /// <summary>
+    /// 执行复活
+    /// </summary>
+    private void DoRevive()
+    {
+        isRevived = true;
+        revivePanel.SetActive(false);
+        currentLives = 1;
+        livesText.text = $"Lives:{currentLives}";
+
+        if (blade != null) blade.ResetPosition();
+        blade.enabled = true;
+        spawner.enabled = true;
+
+        if (newLifeSound != null) audioSource.PlayOneShot(newLifeSound);
+    }
+
+    /// <summary>
+    /// 返回主菜单
+    /// </summary>
+    public void BackToMainMenu()
+    {
+        ClearScene();
+        SceneManager.LoadScene("MainMenu");
+        Time.timeScale = 0f;
+    }
+
+    
 }

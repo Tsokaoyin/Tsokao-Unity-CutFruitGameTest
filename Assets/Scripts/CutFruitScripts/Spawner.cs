@@ -1,43 +1,60 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+//确保该脚本所在的游戏对象上有Collider组件，如果没有则自动添加
 [RequireComponent(typeof(Collider))]
 public class Spawner : MonoBehaviour
 {
-    private Collider spawnArea;
+    private Collider spawnArea;  //生成对象碰撞区域大小
 
-    public GameObject[] fruitPrefabs;
-    public GameObject bombPrefab;
-    [Range(0, 1f)]
-    public float bombChanger = 0.05f;
+    public GameObject[] fruitPrefabs;  //水果预制体数组
+    public GameObject bombPrefab;  //炸弹预制体
+    [Range(0, 1f)]   //随机比例
+    public float bombChanger = 0.05f;   //炸弹随机比例
 
-    public float minSpawnDelay = 0.25f;
-    public float maxSpawnDelay = 1f;
+    public float minSpawnDelay = 0.25f;  //最小生成延迟时间
+    public float maxSpawnDelay = 1f;  //最大生成延迟时间
 
-    public float minAngle = -15f;
-    public float maxAngle = 15f;
+    public float minAngle = -15f;  //最小生成角度
+    public float maxAngle = 15f;  //最大生成角度
 
-    public float minForce = 18f;
-    public float maxForce = 22f;
+    public float minForce = 18f;  //最小生成的力
+    public float maxForce = 22f;  //最大生成力
 
-    public float maxLifeTime = 5f;
+    public float maxLifeTime = 5f;  //生成对象最大生命值，超过改时间将被回收
 
     //对象池引用
     private ObjectPool objectPool;
 
+
     private void Awake()
     {
-        spawnArea = GetComponent<Collider>();
-        objectPool = ObjectPool.Instance;
+        
+        spawnArea = GetComponent<Collider>();  //初始化碰撞组件
+        //确保ObjectPool实例存在
+        if(ObjectPool.Instance==null)
+        {
+            GameObject obj = new GameObject("ObjectPool");
+            obj.AddComponent<ObjectPool>();
+        }
+        objectPool = ObjectPool.Instance;  //初始化对象池引用
 
         //初始化对象池
         InitializeObjectPool();
     }
 
-    //初始化对象池
+    /// <summary>
+    /// 初始化对象池
+    /// </summary>
     private void InitializeObjectPool()
     {
+        if(objectPool==null)
+        {
+            Debug.LogError("objectPool instance is unll in Spawner.InitializeObjectPool");
+            return;
+        }
         //为每种水果预加载对象
         foreach(GameObject prefab in fruitPrefabs)
         {
@@ -58,6 +75,10 @@ public class Spawner : MonoBehaviour
         StopAllCoroutines();
     }
 
+    /// <summary>
+    /// 生成对象的协程方法，不断魂环生成水果或炸弹对象
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Spawn()
     {
         yield return new WaitForSeconds(2f);
@@ -98,6 +119,7 @@ public class Spawner : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         //检查对象是否任然存在且未被切割
+        //检查对象是否处于激活状态（SetActive（true））
         if (obj!=null&&obj.activeSelf)
         {
             objectPool.ReturnToPool(obj);
